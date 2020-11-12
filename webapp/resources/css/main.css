@@ -1,3 +1,12 @@
 body {
-    color: aqua;
+    background-color: aqua;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+}
+
+h2 {
+    color: fuchsia;
+    font-family: "Comic Sans MS";
+    font-size: 100px;
 }
