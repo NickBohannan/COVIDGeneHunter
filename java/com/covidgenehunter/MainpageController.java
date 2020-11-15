@@ -17,33 +17,33 @@ import java.util.Set;
 @Controller
 public class MainpageController {
 
-    private static String filesPath = "C:\\Users\\Nick\\IdeaProjects\\COVIDGeneHunter\\src\\main\\webapp\\resources\\files".replace("\\", "/");
-
-    public static LinkedHashMap<String, DNASequence> geneHashMap;
-    public static LinkedHashMap<String, DNASequence> genomeHashMap;
-    public static Set<Map.Entry<String, DNASequence>> genomeSet;
-
-    public int trueCounter, falseCounter;
-
-    static {
-        try {
-            genomeHashMap = FastaReaderHelper.readFastaDNASequence(new File(filesPath + "/genomicsmall.fna"), false);
-            geneHashMap = FastaReaderHelper.readFastaDNASequence(new File(filesPath + "/sequences.fasta"), false);
-            genomeSet = genomeHashMap.entrySet();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     @RequestMapping(method = RequestMethod.GET)
     public String renderMainPage(ModelMap model) {
-        CharSequence geneSequence = "ATGGGCTATATAAACGTTTTCGCTTTTCCGTTTACGATATATAGTCTACTCTTGTGCAGAATGAATTCTCGTAACTACATAGCACAAGTAGATGTAGTTAACTTTAATCTCACATAG";
-        for (Map.Entry<String, DNASequence> g:genomeSet) {
-            if (g.toString().contains(geneSequence)) {
-                trueCounter++;
-            } else {
-                falseCounter++;
+
+        String filesPath = System.getenv("FASTA_ROOT_DIRECTORY");
+        int trueCounter = 0, falseCounter = 0;
+
+        LinkedHashMap<String, DNASequence> geneHashMap;
+        LinkedHashMap<String, DNASequence> genomeHashMap;
+        Set<Map.Entry<String, DNASequence>> genomeSet;
+
+        try {
+            genomeHashMap = FastaReaderHelper.readFastaDNASequence(new File(filesPath + "/genomicsmall.fna"), true);
+            geneHashMap = FastaReaderHelper.readFastaDNASequence(new File(filesPath + "/sequences.fasta"), true);
+            genomeSet = genomeHashMap.entrySet();
+
+            System.out.println(geneHashMap.values().toString());
+            for (Map.Entry<String, DNASequence> g:genomeSet) {
+                String geneString = geneHashMap.values().toString();
+                if (g.getValue().toString().contains((geneString.substring(1, geneString.length()-1)))) {
+                    trueCounter++;
+                } else {
+                    falseCounter++;
+                }
             }
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         model.addAttribute("message", "Gene Found: " + trueCounter + " | Gene Not Found: " + falseCounter);
